@@ -1,0 +1,28 @@
+# Pre-commit hooks
+repos:
+  - repo: "https://github.com/pre-commit/pre-commit-hooks"
+    rev: "v4.6.0"
+    hooks:
+      - id: "check-yaml"
+      - id: "end-of-file-fixer"
+      - id: "trailing-whitespace"
+      - id: "detect-private-key"
+      - id: "end-of-file-fixer"
+
+  # Secrets and sensitive detection
+  - repo: "https://github.com/gitleaks/gitleaks"
+    rev: "v8.18.3"
+    hooks:
+      - id: "gitleaks"
+
+  # Shell Check
+  - repo: "https://github.com/Anadea/pre-commit-config-shellcheck"
+    rev: "0.3.4"
+    hooks:
+      - id: "pre-commit-config-shellcheck"
+
+  # Golang Formatting
+  - repo: "https://github.com/dnephin/pre-commit-golang"
+    rev: "v0.5.1"
+    hooks:
+      - id: "go-fmt"
