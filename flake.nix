@@ -9,10 +9,10 @@
       pkgs = import nixpkgs { inherit system; };
     in
     {
-      packages.${system}.default = [
-	  	pkgs.figlet
-		pkgs.pre-commit
-		pkgs.golangci-lint
+      packages.${system}.default = with pkgs; [
+	  	figlet
+		pre-commit
+		golangci-lint
 	  ];
 
       devShells.${system} = {
