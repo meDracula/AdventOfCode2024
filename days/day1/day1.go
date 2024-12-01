@@ -96,6 +96,51 @@ func totalDistance(left, right []int) int {
 	return sum
 }
 
+type frequencyMemorization struct {
+	memo map[int]int
+	List []int
+}
+
+func (f *frequencyMemorization) Count(v int) int {
+	// Check memorization map for v
+	if freq, ok := f.memo[v]; ok {
+		return freq
+	}
+	// Create new index of v to memorization map
+	f.memo[v] = 0
+	for _, num := range f.List {
+		if num == v {
+			f.memo[v] = f.memo[v] + 1
+		}
+	}
+	return f.memo[v]
+}
+
+func similarityScore(left, right []int) int {
+	var (
+		score     int                   = 0
+		frequency frequencyMemorization = frequencyMemorization{List: right, memo: map[int]int{}}
+	)
+
+	log.Logger.Debugw("similarity score calculation begins",
+		log.Int("left-length", len(left)),
+		log.Int("right-length", len(right)),
+	)
+
+	for i := 0; i < len(left); i++ {
+		v := left[i]
+		freq := frequency.Count(v)
+		score += v * freq
+
+		log.Logger.Debugw("Add Score",
+			log.Int("value", v),
+			log.Int("frequency", freq),
+			log.Int("score", score),
+		)
+	}
+	return score
+}
+
 func AdventSolveDay1(filename string) {
 	left, right, err := ExtractSplitList(filename)
 
@@ -111,6 +156,13 @@ func AdventSolveDay1(filename string) {
 	go sortList(&wg, right)
 	wg.Wait()
 
+	log.Logger.Infow("Start Part 1", log.String("filename", filename))
 	total := totalDistance(left, right)
-	fmt.Println("TOTAL:", total)
+	fmt.Println("Part 1 Total Distance:", total)
+	log.Logger.Infow("Part 1 Done", log.String("filename", filename), log.Int("Total", total))
+
+	log.Logger.Infow("Start Part 2", log.String("filename", filename))
+	score := similarityScore(left, right)
+	fmt.Println("Part 2 Similarity Score:", score)
+	log.Logger.Infow("Part 2 Done", log.String("filename", filename), log.Int("Score", score))
 }
