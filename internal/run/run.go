@@ -2,11 +2,14 @@ package run
 
 import (
 	"fmt"
+
+	"aoc2024/days/day1"
 )
 
 type AdventSolveDay func(filename string)
 
 var AdventOfDay = map[int]AdventSolveDay{
+	1: day1.AdventSolveDay1,
 }
 
 func Day(day int, file string) {
