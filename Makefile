@@ -24,6 +24,10 @@ lint: requirements
 	golangci-lint run --config .golangci.yml ./...
 	@echo "INFO: Linted, well done 🦾"
 
+build:
+	go build -o ./bin/ ./cmd/...
+	@echo "INFO: OmniFeed are built 💾"
+
 clean: requirements
 	go clean
 	rm -rf dist/
