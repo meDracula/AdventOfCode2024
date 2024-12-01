@@ -12,7 +12,6 @@
       packages.${system}.default = with pkgs; [
 	  	figlet
 		pre-commit
-		golangci-lint
 	  ];
 
       devShells.${system} = {
@@ -21,6 +20,7 @@
           packages = [
 		    self.packages.${system}.default
 			pkgs.go_1_23
+			pkgs.golangci-lint
 		  ];
           shellHook = "go version | figlet";
         };
