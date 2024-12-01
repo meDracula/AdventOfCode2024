@@ -9,7 +9,10 @@
       pkgs = import nixpkgs { inherit system; };
     in
     {
-      packages.${system}.default = [ pkgs.figlet ] ;
+      packages.${system}.default = [
+	  	pkgs.figlet
+		pkgs.pre-commit
+	  ];
 
       devShells.${system} = {
         go = pkgs.mkShell {
@@ -23,4 +26,3 @@
       };
     };
 }
-
