@@ -12,6 +12,7 @@
       packages.${system}.default = [
 	  	pkgs.figlet
 		pkgs.pre-commit
+		pkgs.golangci-lint
 	  ];
 
       devShells.${system} = {
