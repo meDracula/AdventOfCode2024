@@ -6,7 +6,7 @@ linters:
     - govet       # Reports suspicious constructs
     - gosec       # Inspects code for security problems by scanning the Go AST
     - goconst     # Detect repeated values that can be made constants
-    - gomnd       # Magic number detection
+    - mnd         # Magic number detection
     - errcheck    # Detect unchecked errors
     - gosimple    # Suggest code simplifications
     - ineffassign # Detects unused variable assignments
@@ -29,6 +29,11 @@ linters:
     - tparallel # Detects inappropriate use of t.Parallel()
 
 issues:
+  # Exclude nix store explicitly
+  exclude-dirs:
+    - /nix/store/
+    - /go/pkg/
+
   exclude-rules:
     # Exclude some linters from running on tests files.
     - path: _test\.go
