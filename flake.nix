@@ -16,7 +16,7 @@
           name = "default";
           packages = [
 		    self.packages.${system}.default
-			pkgs.go_1_22
+			pkgs.go_1_23
 		  ];
           shellHook = "go version | figlet";
         };
