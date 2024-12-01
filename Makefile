@@ -26,7 +26,7 @@ lint: requirements
 
 build:
 	go build -o ./bin/ ./cmd/...
-	@echo "INFO: OmniFeed are built 💾"
+	@echo "INFO: Binaries are built 💾"
 
 clean: requirements
 	go clean
