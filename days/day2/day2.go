@@ -45,58 +45,99 @@ func extractReports(filename string) [][]int {
 	return reports
 }
 
+type ReportSafetySystemFunc func(report []int) bool
+
+func safetyLevelcheck(report []int, ruleBreak func(i, j int) bool) bool {
+	for i := 1; i < len(report); i++ {
+		if ruleBreak(report[i-1], report[i]) {
+			return false
+		}
+	}
+	return true
+}
+
 func reportSafetySystemCheck(report []int) bool {
 	// Either level increasing nor decreasing
 	if report[0] == report[1] {
-		log.Logger.Debugw("Level Unsafe Equal", log.Any("report", report))
 		return false
+	}
+
+	// Rule function for decreasing order
+	ruleFunc := func(i, j int) bool {
+		return i <= j || (i-j) > 3
 	}
 
 	// Determine if increasing
 	if report[0] < report[1] {
-		// Level is increasing
-		for i := 1; i < len(report); i++ {
-			if report[i-1] >= report[i] || (report[i]-report[i-1]) > 3 {
-				log.Logger.Debugw("Level Unsafe Increasing",
-					log.Any("report", report),
-					log.Int("i-1", report[i-1]),
-					log.Int("i", report[i]),
-				)
-				return false
-			}
-		}
-	} else {
-		// Level is decreasing
-		for i := 1; i < len(report); i++ {
-			// not decreasing or more than three increment
-			if report[i-1] <= report[i] || (report[i-1]-report[i]) > 3 {
-				log.Logger.Debugw("Level Unsafe Decreasing",
-					log.Any("report", report),
-					log.Int("i-1", report[i-1]),
-					log.Int("i", report[i]),
-				)
-				return false
-			}
+		// change rule function to increasing rule
+		ruleFunc = func(i, j int) bool {
+			return i >= j || (j-i) > 3
 		}
 	}
-	log.Logger.Debugw("Level Safe", log.Any("report", report))
-	return true
+	return safetyLevelcheck(report, ruleFunc)
 }
 
-func countSafeReports(filename string) int {
+func countSafeReports(filename string, safetySystemFunc ReportSafetySystemFunc) int {
 	reports := extractReports(filename)
+	safeCountch := make(chan int, len(reports))
+
+	for _, report := range reports {
+		go func(report []int, safetySystemFunc ReportSafetySystemFunc, safeCountch chan<- int) {
+			if safetySystemFunc(report) {
+				log.Logger.Debugw("Level Safe", log.Any("report", report))
+				safeCountch <- 1
+			} else {
+				log.Logger.Debugw("Report Unsafe Equal", log.Any("report", report))
+				safeCountch <- 0
+			}
+		}(report, safetySystemFunc, safeCountch)
+	}
 
 	safeCount := 0
+	for s := 0; s < len(reports); s++ {
+		safeCount += <-safeCountch
+	}
+
+	return safeCount
+}
+
+func countSafeReportsWithDampener(filename string, safetySystemFunc ReportSafetySystemFunc) int {
+	reports := extractReports(filename)
+	safeCountch := make(chan int, len(reports))
+
 	for _, report := range reports {
-		if reportSafetySystemCheck(report) {
-			safeCount++
-		}
+		go func(report []int, safetySystemFunc ReportSafetySystemFunc, safeCountch chan<- int) {
+			// Generate report permutation of report
+			for i := range report {
+				subReport := make([]int, 0, len(report)-1)
+				subReport = append(subReport, report[:i]...)
+				subReport = append(subReport, report[i+1:]...)
+
+				if safetySystemFunc(subReport) {
+					safeCountch <- 1
+					return
+				}
+			}
+			safeCountch <- 0 // All permutation of report are unsafe
+		}(report, safetySystemFunc, safeCountch)
+	}
+
+	safeCount := 0
+	for s := 0; s < len(reports); s++ {
+		safeCount += <-safeCountch
 	}
 
 	return safeCount
 }
 
 func AdventSolveDay2(filename string) {
-	safe := countSafeReports(filename)
-	fmt.Println("Safe:", safe)
+	log.Logger.Infow("Start Part 1", log.String("filename", filename))
+	safe := countSafeReports(filename, reportSafetySystemCheck)
+	fmt.Println("Safe Part 1:", safe)
+	log.Logger.Infow("Part 1 Done", log.String("filename", filename), log.Int("Safe", safe))
+
+	log.Logger.Infow("Start Part 2", log.String("filename", filename))
+	safeWithDampeners := countSafeReportsWithDampener(filename, reportSafetySystemCheck)
+	fmt.Println("Safe with Dampeners:", safeWithDampeners)
+	log.Logger.Infow("Part 2 Done", log.String("filename", filename), log.Int("Safe", safeWithDampeners))
 }
