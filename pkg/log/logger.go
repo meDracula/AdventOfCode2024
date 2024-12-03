@@ -95,6 +95,31 @@ func NewLogger(optFns ...OptFunc) *zap.SugaredLogger {
 	return logger.Sugar()
 }
 
+// Debug logs a message with some additional context. The variadic key-value pairs are treated as they are in With.
+func Debug(msg string, keysAndValues ...interface{}) {
+	Logger.Debugw(msg, keysAndValues...)
+}
+
+// Info logs a message with some additional context. The variadic key-value pairs are treated as they are in With.
+func Info(msg string, keysAndValues ...interface{}) {
+	Logger.Infow(msg, keysAndValues...)
+}
+
+// Warn logs a message with some additional context. The variadic key-value pairs are treated as they are in With.
+func Warn(msg string, keysAndValues ...interface{}) {
+	Logger.Warnw(msg, keysAndValues...)
+}
+
+// Error logs a message with some additional context. The variadic key-value pairs are treated as they are in With.
+func Error(msg string, keysAndValues ...interface{}) {
+	Logger.Errorw(msg, keysAndValues...)
+}
+
+// Fatal logs a message with some additional context, then calls os.Exit. The variadic key-value pairs are treated as they are in With.
+func Fatal(msg string, keysAndValues ...interface{}) {
+	Logger.Fatalw(msg, keysAndValues...)
+}
+
 // CapturesLogs capture the logs
 func CapturesLogs(level zapcore.Level) *observer.ObservedLogs {
 	observerCore, observedlogs := observer.New(level)

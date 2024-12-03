@@ -13,7 +13,7 @@ import (
 func extractReports(filename string) [][]int {
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Logger.Fatalw("Failed to open file",
+		log.Fatal("Failed to open file",
 			log.String("filename", filename),
 			log.String("error", err.Error()),
 		)
@@ -32,7 +32,7 @@ func extractReports(filename string) [][]int {
 		for _, level := range levels {
 			v, err := strconv.Atoi(level)
 			if err != nil {
-				log.Logger.Fatalw("Cannot convert level to int",
+				log.Fatal("Cannot convert level to int",
 					log.String("level", level),
 					log.String("error", err.Error()),
 					log.Any("levels", levels),
@@ -84,10 +84,10 @@ func countSafeReports(filename string, safetySystemFunc ReportSafetySystemFunc) 
 	for _, report := range reports {
 		go func(report []int, safetySystemFunc ReportSafetySystemFunc, safeCountch chan<- int) {
 			if safetySystemFunc(report) {
-				log.Logger.Debugw("Level Safe", log.Any("report", report))
+				log.Debug("Level Safe", log.Any("report", report))
 				safeCountch <- 1
 			} else {
-				log.Logger.Debugw("Report Unsafe Equal", log.Any("report", report))
+				log.Debug("Report Unsafe Equal", log.Any("report", report))
 				safeCountch <- 0
 			}
 		}(report, safetySystemFunc, safeCountch)
@@ -131,13 +131,13 @@ func countSafeReportsWithDampener(filename string, safetySystemFunc ReportSafety
 }
 
 func AdventSolveDay2(filename string) {
-	log.Logger.Infow("Start Part 1", log.String("filename", filename))
+	log.Info("Start Part 1", log.String("filename", filename))
 	safe := countSafeReports(filename, reportSafetySystemCheck)
 	fmt.Println("Safe Part 1:", safe)
-	log.Logger.Infow("Part 1 Done", log.String("filename", filename), log.Int("Safe", safe))
+	log.Info("Part 1 Done", log.String("filename", filename), log.Int("Safe", safe))
 
-	log.Logger.Infow("Start Part 2", log.String("filename", filename))
+	log.Info("Start Part 2", log.String("filename", filename))
 	safeWithDampeners := countSafeReportsWithDampener(filename, reportSafetySystemCheck)
 	fmt.Println("Safe with Dampeners:", safeWithDampeners)
-	log.Logger.Infow("Part 2 Done", log.String("filename", filename), log.Int("Safe", safeWithDampeners))
+	log.Info("Part 2 Done", log.String("filename", filename), log.Int("Safe", safeWithDampeners))
 }
