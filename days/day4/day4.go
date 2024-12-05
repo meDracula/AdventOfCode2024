@@ -74,7 +74,6 @@ func (xmas *Xmas) searchForAllXMAS() int {
 	return count
 }
 
-// TODO Work in progress
 func (xmas *Xmas) searchAllXXMAS() int {
 	grid := []struct {
 		dx, dy int
@@ -85,20 +84,51 @@ func (xmas *Xmas) searchAllXXMAS() int {
 		{-1, 1},  // up-right
 	}
 
+	const (
+		M = 'M'
+		S = 'S'
+	)
+
 	isXXMAS := func(x, y int) bool {
+		// Not match character (exclude all other then S or M)
 		for _, dir := range grid {
 			nx, ny := x+dir.dx, y+dir.dy
-			log.Debug("Character",
-				log.String("Rune", string(xmas.text[nx][ny])),
-				log.Int("nx", nx),
-				log.Int("ny", ny),
-			)
-			if xmas.text[nx][ny] != 'S' && xmas.text[nx][ny] != 'M' {
+
+			if xmas.text[ny][nx] != 'S' && xmas.text[ny][nx] != 'M' {
 				return false
 			}
 		}
 
-		return false
+		log.Debug("",
+			log.String("up-left", string(xmas.text[y-1][x-1])),
+			log.String("up-right", string(xmas.text[y-1][x+1])),
+			log.String("down-left", string(xmas.text[y+1][x-1])),
+			log.String("down-right", string(xmas.text[y+1][x+1])),
+		)
+
+		// Check opposite M and S up-left with down-right
+		if xmas.text[y-1][x-1] == M {
+			if xmas.text[y+1][x+1] != S {
+				return false
+			}
+		} else {
+			if xmas.text[y+1][x+1] != M {
+				return false
+			}
+		}
+
+		// Check opposite M and S up-right with down-left
+		if xmas.text[y-1][x+1] == M {
+			if xmas.text[y+1][x-1] != S {
+				return false
+			}
+		} else {
+			if xmas.text[y+1][x-1] != M {
+				return false
+			}
+		}
+
+		return true
 	}
 
 	count := 0
@@ -145,7 +175,6 @@ func AdventSolveDay4(filename string) {
 	fmt.Println("Found XMAS:", foundAllXMAS)
 	log.Info("Done Part 1", log.String("filename", filename))
 
-	// TODO Work in progress
 	log.Info("Start Part 2", log.String("filename", filename))
 	foundAllXXMAS := xmas.searchAllXXMAS()
 	fmt.Println("Found X-MAS:", foundAllXXMAS)
