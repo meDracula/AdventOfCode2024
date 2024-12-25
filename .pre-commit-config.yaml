@@ -9,6 +9,12 @@ repos:
       - id: "detect-private-key"
       - id: "end-of-file-fixer"
 
+  # Secrets and sensitive detection
+  - repo: "https://github.com/gitleaks/gitleaks"
+    rev: "v8.18.3"
+    hooks:
+      - id: "gitleaks"
+
   # Shell Check
   - repo: "https://github.com/Anadea/pre-commit-config-shellcheck"
     rev: "0.3.4"
