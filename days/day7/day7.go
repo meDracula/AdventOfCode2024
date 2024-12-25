@@ -32,6 +32,7 @@ func (o Operator) Eval(a, b int) int {
 		return con
 	}
 	panic(fmt.Sprintf("Non supported operator %v", o))
+	return 0
 }
 
 func CartesianProductOperators(operators []Operator, repeat int) [][]Operator {
