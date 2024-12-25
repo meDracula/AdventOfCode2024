@@ -83,7 +83,7 @@ func ResonantCollinearity(frequencyNodes FrequencyNodeMap, mapBoarder MapBoarder
 				log.Debug("Diff nodes",
 					log.String("Frequency", string(freq)),
 					log.Any("Selected Node", selectedNode),
-					log.Any("Diff Node", n),
+					log.Any("AntiNode", n),
 					log.Int("Diff.X", dx),
 					log.Int("Diff.Y", dy),
 				)
@@ -96,6 +96,66 @@ func ResonantCollinearity(frequencyNodes FrequencyNodeMap, mapBoarder MapBoarder
 
 				// Make or re-add antinode
 				antiNodes[n] = true
+			}
+		}
+	}
+
+	return antiNodes
+}
+
+func ResonantCollinearityHarmonics(frequencyNodes FrequencyNodeMap, mapBoarder MapBoarder) AntiNodeMap {
+	antiNodes := AntiNodeMap{}
+
+	for freq, nodes := range frequencyNodes {
+		log.Debug("Comparing new antenna frequency",
+			log.String("Frequency", string(freq)),
+			log.Any("Nodes", nodes),
+		)
+		// Special case: lone antenna no antinodes will be created.
+		if len(nodes) <= 1 {
+			log.Debug("lone antenna therefore no antinodes to add!",
+				log.String("Frequency", string(freq)),
+				log.Any("Nodes", nodes),
+			)
+			continue
+		}
+		for selectedNodeIndex, selectedNode := range nodes {
+			// Selected node compare with all other nodes
+			for i := 0; i < len(nodes); i++ {
+				// Skip over the selected node index
+				if selectedNodeIndex == i {
+					continue
+				}
+				// Diff nodes
+				dx := nodes[i].X - selectedNode.X
+				dy := nodes[i].Y - selectedNode.Y
+
+				// resonant harmonics move dx and dy direction
+				harm := 1
+				for {
+					n := Node{X: selectedNode.X + (dx * harm), Y: selectedNode.Y + (dy * harm)}
+
+					log.Debug("Diff Harmonics nodes",
+						log.String("Frequency", string(freq)),
+						log.Any("Selected Node", selectedNode),
+						log.Any("AntiNode", n),
+						log.Int("Harmonics", harm),
+						log.Int("Diff.X", dx*harm),
+						log.Int("Diff.Y", dy*harm),
+					)
+
+					// out bounds of the map
+					if (n.X < 0 || n.X >= mapBoarder.X) || (n.Y < 0 || n.Y >= mapBoarder.Y) {
+						log.Debug("AntiNode out-bound map", log.Any("node", n), log.Any("Boarder", mapBoarder))
+						break // Skip adding to antiNodes
+					}
+
+					// Make or re-add antinode
+					antiNodes[n] = true
+
+					// Increase the resonant harmonics
+					harm++
+				}
 			}
 		}
 	}
@@ -135,14 +195,20 @@ func extractFile(filename string) (FrequencyNodeMap, MapBoarder) {
 
 func AdventSolveDay8(filename string) {
 	log.Info("Start Part 1", log.String("filename", filename))
-
 	frequencyNodes, mapBoarder := extractFile(filename)
 	frequencyNodes.Print()
 
 	antiNodes := ResonantCollinearity(frequencyNodes, mapBoarder)
 	antiNodes.Print()
-	locations := antiNodes.Unqiue()
-	fmt.Println("total unique locations:", locations)
+	fmt.Println("total unique locations:", antiNodes.Unqiue())
 
-	log.Info("Done Part 1", log.String("filename", filename), log.Int("locations", locations))
+	log.Info("Done Part 1", log.String("filename", filename), log.Int("locations", antiNodes.Unqiue()))
+
+	log.Info("Start Part 2", log.String("filename", filename))
+
+	antiNodes = ResonantCollinearityHarmonics(frequencyNodes, mapBoarder)
+	antiNodes.Print()
+	fmt.Println("total unique locations:", antiNodes.Unqiue())
+
+	log.Info("Done Part 2", log.String("filename", filename), log.Int("locations", antiNodes.Unqiue()))
 }
