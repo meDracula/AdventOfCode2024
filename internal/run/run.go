@@ -10,6 +10,7 @@ import (
 	"aoc2024/days/day5"
 	"aoc2024/days/day6"
 	"aoc2024/days/day7"
+	"aoc2024/days/day8"
 )
 
 type AdventSolveDay func(filename string)
@@ -22,6 +23,7 @@ var AdventOfDay = map[int]AdventSolveDay{
 	5: day5.AdventSolveDay5,
 	6: day6.AdventSolveDay6,
 	7: day7.AdventSolveDay7,
+	8: day8.AdventSolveDay8,
 }
 
 func Day(day int, file string) {
